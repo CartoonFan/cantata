@@ -21,11 +21,11 @@
 # Thanks to the GNOME icon developers for the original version of this script
 # ------------8<----------
 
+import argparse
 import os
+import subprocess
 import sys
 import xml.sax
-import subprocess
-import argparse
 
 INKSCAPE = "/usr/bin/inkscape"
 OPTIPNG = "/usr/bin/optipng"
