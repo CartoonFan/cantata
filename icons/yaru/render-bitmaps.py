@@ -71,7 +71,10 @@ def main(SRC):
         if inkscape_process is None:
             inkscape_process = start_inkscape()
 
-        cmd = [icon_file, "--export-dpi", str(dpi), "-i", rect, "-e", output_file]
+        cmd = [
+            icon_file, "--export-dpi",
+            str(dpi), "-i", rect, "-e", output_file
+        ]
         wait_for_prompt(inkscape_process, " ".join(cmd))
         optimize_png(output_file)
 
@@ -102,13 +105,10 @@ def main(SRC):
                     self.inside.append(self.SVG)
                     return
             elif self.inside[-1] == self.SVG:
-                if (
-                    name == "g"
-                    and ("inkscape:groupmode" in attrs)
-                    and ("inkscape:label" in attrs)
-                    and attrs["inkscape:groupmode"] == "layer"
-                    and attrs["inkscape:label"].startswith("Baseplate")
-                ):
+                if (name == "g" and ("inkscape:groupmode" in attrs)
+                        and ("inkscape:label" in attrs)
+                        and attrs["inkscape:groupmode"] == "layer"
+                        and attrs["inkscape:label"].startswith("Baseplate")):
                     self.stack.append(self.LAYER)
                     self.inside.append(self.LAYER)
                     self.context = None
@@ -116,21 +116,15 @@ def main(SRC):
                     self.rects = []
                     return
             elif self.inside[-1] == self.LAYER:
-                if (
-                    name == "text"
-                    and ("inkscape:label" in attrs)
-                    and attrs["inkscape:label"] == "context"
-                ):
+                if (name == "text" and ("inkscape:label" in attrs)
+                        and attrs["inkscape:label"] == "context"):
                     self.stack.append(self.TEXT)
                     self.inside.append(self.TEXT)
                     self.text = "context"
                     self.chars = ""
                     return
-                elif (
-                    name == "text"
-                    and ("inkscape:label" in attrs)
-                    and attrs["inkscape:label"] == "icon-name"
-                ):
+                elif (name == "text" and ("inkscape:label" in attrs)
+                      and attrs["inkscape:label"] == "icon-name"):
                     self.stack.append(self.TEXT)
                     self.inside.append(self.TEXT)
                     self.text = "icon-name"
@@ -181,7 +175,8 @@ def main(SRC):
                             stat_in = os.stat(self.path)
                             stat_out = os.stat(outfile)
                             if stat_in.st_mtime > stat_out.st_mtime:
-                                inkscape_render_rect(self.path, id, dpi, outfile)
+                                inkscape_render_rect(self.path, id, dpi,
+                                                     outfile)
                                 sys.stdout.write(".")
                             else:
                                 sys.stdout.write("-")
