@@ -35,6 +35,7 @@ DPIS = [1, 2]
 
 inkscape_process = None
 
+
 def main(SRC):
 
     def optimize_png(png_file):
@@ -58,7 +59,8 @@ def main(SRC):
             output = output[1:]
 
     def start_inkscape():
-        process = subprocess.Popen([INKSCAPE, '--shell'], bufsize=0, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            [INKSCAPE, '--shell'], bufsize=0, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         wait_for_prompt(process)
         return process
 
@@ -80,6 +82,7 @@ def main(SRC):
         LAYER = 2
         OTHER = 3
         TEXT = 4
+
         def __init__(self, path, force=False, filter=None):
             self.stack = [self.ROOT]
             self.inside = [self.ROOT]
@@ -101,7 +104,7 @@ def main(SRC):
                     return
             elif self.inside[-1] == self.SVG:
                 if (name == "g" and ('inkscape:groupmode' in attrs) and ('inkscape:label' in attrs)
-                   and attrs['inkscape:groupmode'] == 'layer' and attrs['inkscape:label'].startswith('Baseplate')):
+                        and attrs['inkscape:groupmode'] == 'layer' and attrs['inkscape:label'].startswith('Baseplate')):
                     self.stack.append(self.LAYER)
                     self.inside.append(self.LAYER)
                     self.context = None
@@ -112,20 +115,19 @@ def main(SRC):
                 if name == "text" and ('inkscape:label' in attrs) and attrs['inkscape:label'] == 'context':
                     self.stack.append(self.TEXT)
                     self.inside.append(self.TEXT)
-                    self.text='context'
+                    self.text = 'context'
                     self.chars = ""
                     return
                 elif name == "text" and ('inkscape:label' in attrs) and attrs['inkscape:label'] == 'icon-name':
                     self.stack.append(self.TEXT)
                     self.inside.append(self.TEXT)
-                    self.text='icon-name'
+                    self.text = 'icon-name'
                     self.chars = ""
                     return
                 elif name == "rect":
                     self.rects.append(attrs)
 
             self.stack.append(self.OTHER)
-
 
         def endElement(self, name):
             stacked = self.stack.pop()
@@ -146,7 +148,7 @@ def main(SRC):
                 if self.filter is not None and self.icon_name not in self.filter:
                     return
 
-                print (self.context, self.icon_name)
+                print(self.context, self.icon_name)
                 for rect in self.rects:
                     for dpi_factor in DPIS:
                         width = rect['width']
@@ -167,7 +169,8 @@ def main(SRC):
                             stat_in = os.stat(self.path)
                             stat_out = os.stat(outfile)
                             if stat_in.st_mtime > stat_out.st_mtime:
-                                inkscape_render_rect(self.path, id, dpi, outfile)
+                                inkscape_render_rect(
+                                    self.path, id, dpi, outfile)
                                 sys.stdout.write('.')
                             else:
                                 sys.stdout.write('-')
@@ -178,15 +181,15 @@ def main(SRC):
         def characters(self, chars):
             self.chars += chars.strip()
 
-
-    print ('')
-    print ('Rendering from SVGs in', SRC)
-    print ('')
+    print('')
+    print('Rendering from SVGs in', SRC)
+    print('')
     for file in os.listdir(SRC):
         if file[-4:] == '.svg':
             file = os.path.join(SRC, file)
             handler = ContentHandler(file)
             xml.sax.parse(open(file), handler)
-    print ('')
+    print('')
+
 
 main('.')
